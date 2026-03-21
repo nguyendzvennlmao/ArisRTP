@@ -1,0 +1,12 @@
+name: ArisRTP
+version: 1.0
+main: me.vennlmao.arisrtp.ArisRTP
+api-version: 1.20
+author: VennLMAO
+folia-supported: true
+commands:
+  rtp:
+    aliases: [randomtp]
+permissions:
+  arisrtp.admin:
+    default: op
