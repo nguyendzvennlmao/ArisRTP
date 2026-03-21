@@ -1,0 +1,30 @@
+settings:
+  cooldown-seconds: 60
+  max-retries: 20
+  sounds:
+    gui-click: "UI_BUTTON_CLICK"
+    countdown-tick: "BLOCK_NOTE_BLOCK_CHIME"
+    teleport-success: "ENTITY_PLAYER_LEVELUP"
+    cooldown-error: "ENTITY_VILLAGER_NO"
+  worlds:
+    world:
+      max-radius: 5000
+      min-radius: 100
+      item: GRASS_BLOCK
+      name: "&#ff0812&lOVERWORLD"
+      lore:
+        - "&7Click để dịch chuyển ngẫu nhiên"
+    world_nether:
+      max-radius: 2000
+      min-radius: 50
+      item: NETHERRACK
+      name: "&c&lNETHER"
+      lore:
+        - "&7Click để dịch chuyển đến địa ngục"
+    world_the_end:
+      max-radius: 3000
+      min-radius: 100
+      item: END_STONE
+      name: "&e&lTHE END"
+      lore:
+        - "&7Click để dịch chuyển đến kết thúc"
