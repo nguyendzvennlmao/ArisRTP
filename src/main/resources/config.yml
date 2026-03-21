@@ -1,4 +1,7 @@
 settings:
+  gui:
+    title: "&8&lRANDOM TELEPORT"
+    rows: 3
   cooldown-seconds: 60
   max-retries: 20
   sounds:
@@ -8,13 +11,15 @@ settings:
     cooldown-error: "ENTITY_VILLAGER_NO"
   worlds:
     world:
+      slot: 11
       max-radius: 5000
       min-radius: 100
       item: GRASS_BLOCK
-      name: "&#ff0812&lOVERWORLD"
+      name: "&#fb0000&lOVERWORLD"
       lore:
         - "&7Click để dịch chuyển ngẫu nhiên"
     world_nether:
+      slot: 13
       max-radius: 2000
       min-radius: 50
       item: NETHERRACK
@@ -22,6 +27,7 @@ settings:
       lore:
         - "&7Click để dịch chuyển đến địa ngục"
     world_the_end:
+      slot: 15
       max-radius: 3000
       min-radius: 100
       item: END_STONE
