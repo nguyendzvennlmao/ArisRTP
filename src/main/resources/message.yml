@@ -1,0 +1,21 @@
+messages:
+  searching:
+    text: "&#ff0812Đang tìm vị trí an toàn..."
+    chat: true
+    actionbar: false
+  countdown:
+    text: "&#ff0812Dịch chuyển sau &b%time%s"
+    chat: true
+    actionbar: false
+  success:
+    text: "&#facc15Bạn đã được dịch chuyển thành công!"
+    chat: true
+    actionbar: false
+  cooldown:
+    text: "&#ff0812Bạn phải chờ 1 phút để tiếp tục sử dụng lệnh này!"
+    chat: true
+    actionbar: false
+  reload:
+    text: "&a[ArisRTP] Đã reload cấu hình!"
+    chat: true
+    actionbar: false
