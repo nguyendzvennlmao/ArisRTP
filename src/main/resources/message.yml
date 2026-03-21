@@ -1,21 +1,25 @@
 messages:
   searching:
-    text: "&#ff0812Đang tìm vị trí an toàn..."
+    text: "&#fb0000Đang tìm vị trí an toàn..."
     chat: true
-    actionbar: false
+    actionbar: true
   countdown:
-    text: "&#ff0812Dịch chuyển sau &b%time%s"
+    text: "&#fb0000Dịch chuyển sau &b%time%s"
     chat: true
-    actionbar: false
+    actionbar: true
   success:
     text: "&#facc15Bạn đã được dịch chuyển thành công!"
     chat: true
-    actionbar: false
-  cooldown:
-    text: "&#ff0812Bạn phải chờ 1 phút để tiếp tục sử dụng lệnh này!"
+    actionbar: true
+  cancelled:
+    text: "&#fb0000Hành động bị hủy (Bạn đã di chuyển hoặc bị thương)!"
     chat: true
-    actionbar: false
+    actionbar: true
+  cooldown:
+    text: "&#fb0000Vui lòng chờ cooldown để tiếp tục!"
+    chat: true
+    actionbar: true
   reload:
     text: "&a[ArisRTP] Đã reload cấu hình!"
     chat: true
-    actionbar: false
+    actionbar: true
