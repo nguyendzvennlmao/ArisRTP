@@ -1,9 +1,9 @@
 settings:
   gui:
-    title: "&8&lRANDOM TELEPORT"
+    title: "&8ʀᴀɴᴅᴏᴍ ᴛᴇʟᴇᴘᴏʀᴛ"
     rows: 3
   cooldown-seconds: 60
-  max-retries: 20
+  max-retries: 50
   sounds:
     gui-click: "UI_BUTTON_CLICK"
     countdown-tick: "BLOCK_NOTE_BLOCK_CHIME"
@@ -12,25 +12,31 @@ settings:
   worlds:
     world:
       slot: 11
+      min-y: 63
+      max-y: 120
       max-radius: 5000
       min-radius: 100
       item: GRASS_BLOCK
-      name: "&#fb0000&lOVERWORLD"
+      name: "&#facc15ᴏᴠᴇʀᴡᴏʀʟᴅ"
       lore:
-        - "&7Click để dịch chuyển ngẫu nhiên"
+        - "&fClick to randomly teleport"
     world_nether:
       slot: 13
+      min-y: 32
+      max-y: 110
       max-radius: 2000
       min-radius: 50
       item: NETHERRACK
-      name: "&c&lNETHER"
+      name: "&#facc15ɴᴇᴛʜᴇʀ"
       lore:
-        - "&7Click để dịch chuyển đến địa ngục"
+        - "&fClick to randomly teleport"
     world_the_end:
       slot: 15
+      min-y: 55
+      max-y: 75
       max-radius: 3000
       min-radius: 100
       item: END_STONE
-      name: "&e&lTHE END"
+      name: "&#facc15ᴇɴᴅ"
       lore:
-        - "&7Click để dịch chuyển đến kết thúc"
+        - "&fClick to randomly teleport"
