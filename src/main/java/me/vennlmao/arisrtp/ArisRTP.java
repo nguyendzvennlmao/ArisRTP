@@ -3,6 +3,7 @@ package me.vennlmao.arisrtp;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,6 +32,10 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
     private final Set<UUID> teleporting = new HashSet<>();
     private FileConfiguration msgConfig;
     private final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
+    private final List<Material> unsafeBlocks = Arrays.asList(
+        Material.LAVA, Material.WATER, Material.FIRE, Material.MAGMA_BLOCK, 
+        Material.CACTUS, Material.VOID_AIR, Material.AIR, Material.CAVE_AIR, Material.BEDROCK
+    );
 
     @Override
     public void onEnable() {
@@ -75,11 +80,9 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
                 return;
             }
         }
-
         String title = translate(getConfig().getString("settings.gui.title", "&8Random Teleport"));
         int rows = getConfig().getInt("settings.gui.rows", 3) * 9;
         Inventory gui = Bukkit.createInventory(null, rows, title);
-
         ConfigurationSection worlds = getConfig().getConfigurationSection("settings.worlds");
         if (worlds != null) {
             for (String key : worlds.getKeys(false)) {
@@ -94,7 +97,6 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         int slot = getConfig().getInt(path + ".slot");
         String matName = getConfig().getString(path + ".item");
         if (matName == null || slot >= gui.getSize()) return;
-
         ItemStack item = new ItemStack(Material.valueOf(matName));
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -112,10 +114,8 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         String title = translate(getConfig().getString("settings.gui.title", "&8Random Teleport"));
         if (!e.getView().getTitle().equals(title)) return;
         e.setCancelled(true);
-        
         Player p = (Player) e.getWhoClicked();
         int clickedSlot = e.getRawSlot();
-
         ConfigurationSection worlds = getConfig().getConfigurationSection("settings.worlds");
         if (worlds != null) {
             for (String key : worlds.getKeys(false)) {
@@ -145,7 +145,6 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         Location startLoc = p.getLocation();
         UUID id = p.getUniqueId();
         teleporting.add(id);
-
         for (int i = 5; i >= 0; i--) {
             int time = i;
             p.getScheduler().execute(this, () -> {
@@ -168,15 +167,35 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
     }
 
     private void findSafe(Player p, World w, int t) {
-        if (t > getConfig().getInt("settings.max-retries")) return;
+        if (t >= getConfig().getInt("settings.max-retries")) {
+            sendCustomMessage(p, "not-found");
+            playConfigSound(p, "cooldown-error");
+            return;
+        }
         sendCustomMessage(p, "searching");
-        int r = getConfig().getInt("settings.worlds." + w.getName() + ".max-radius");
+        String path = "settings.worlds." + w.getName();
+        int r = getConfig().getInt(path + ".max-radius");
+        int minY = getConfig().getInt(path + ".min-y");
+        int maxY = getConfig().getInt(path + ".max-y");
         int x = ThreadLocalRandom.current().nextInt(-r, r);
         int z = ThreadLocalRandom.current().nextInt(-r, r);
-        int y = w.getHighestBlockYAt(x, z);
-        Location loc = new Location(w, x + 0.5, y + 1, z + 0.5);
-        Material block = loc.clone().add(0, -1, 0).getBlock().getType();
-        if (block == Material.LAVA || block == Material.WATER || block == Material.AIR) {
+        int y = -1;
+        for (int i = maxY; i >= minY; i--) {
+            Block b = w.getBlockAt(x, i, z);
+            if (b.getType().isSolid() && b.getType() != Material.BEDROCK) {
+                if (w.getBlockAt(x, i + 1, z).getType() == Material.AIR && w.getBlockAt(x, i + 2, z).getType() == Material.AIR) {
+                    y = i + 1;
+                    break;
+                }
+            }
+        }
+        if (y == -1) {
+            findSafe(p, w, t + 1);
+            return;
+        }
+        Location loc = new Location(w, x + 0.5, y, z + 0.5);
+        Material standingOn = loc.clone().add(0, -1, 0).getBlock().getType();
+        if (unsafeBlocks.contains(standingOn)) {
             findSafe(p, w, t + 1);
             return;
         }
@@ -212,4 +231,4 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         matcher.appendTail(sb);
         return ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
-        }
+}
