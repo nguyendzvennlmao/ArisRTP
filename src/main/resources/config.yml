@@ -12,14 +12,14 @@ settings:
   worlds:
     world:
       slot: 11
-      min-y: 50
+      min-y: 63
       max-y: 120
       max-radius: 5000
       min-radius: 100
       item: GRASS_BLOCK
       name: "&#facc15ᴏᴠᴇʀᴡᴏʀʟᴅ"
       lore:
-        - "&fClick to randomly teleport"
+        - "&fNhấp để dịch chuyển ngẫu nhiên"
     world_nether:
       slot: 13
       min-y: 32
@@ -29,14 +29,14 @@ settings:
       item: NETHERRACK
       name: "&#facc15ɴᴇᴛʜᴇʀ"
       lore:
-        - "&fClick to randomly teleport"
+        - "&fNhấp để dịch chuyển ngẫu nhiên"
     world_the_end:
       slot: 15
-      min-y: 50
-      max-y: 100
+      min-y: 55
+      max-y: 75
       max-radius: 3000
       min-radius: 100
       item: END_STONE
       name: "&#facc15ᴇɴᴅ"
       lore:
-        - "&fClick to randomly teleport"
+        - "&fNhấp để dịch chuyển ngẫu nhiên"
