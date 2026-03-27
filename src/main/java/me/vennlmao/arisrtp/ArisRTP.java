@@ -233,4 +233,4 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         matcher.appendTail(sb);
         return ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
-                }
+                             }
