@@ -1,29 +1,29 @@
 messages:
-  searching:
-    text: "&#fb0000Đang tìm vị trí an toàn..."
-    chat: false
+  reload:
+    text: "&#facc15[ArisRTP] &fĐã tải lại cấu hình thành công!"
+    chat: true
+    actionbar: false
+  cooldown:
+    text: "&#ff0812[ArisRTP] &fBạn phải đợi trước khi sử dụng lại!"
+    chat: true
     actionbar: true
   countdown:
-    text: "&7Dịch chuyển sau &#facc15%time%s"
-    chat: true
-    actionbar: true
-  success:
-    text: "&aBạn đã được dịch chuyển thành công!"
-    chat: true
+    text: "&#facc15[ArisRTP] &fDịch chuyển sau &e%time% &fgiây..."
+    chat: false
     actionbar: true
   cancelled:
-    text: "&#ff0812Dịch chuyển bị hủy vì bạn đã di chuyển!"
+    text: "&#ff0812[ArisRTP] &fDịch chuyển bị hủy do bạn đã di chuyển hoặc nhận sát thương!"
+    chat: true
+    actionbar: false
+  searching:
+    text: "&#facc15[ArisRTP] &fĐang tìm kiếm vị trí an toàn..."
+    chat: false
+    actionbar: true
+  success:
+    text: "&#facc15[ArisRTP] &fDịch chuyển thành công!"
     chat: true
     actionbar: true
   not-found:
-    text: "&#ff0812Không tìm thấy vị trí an toàn, hãy thử lại!"
+    text: "&#ff0812[ArisRTP] &fKhông tìm thấy vị trí an toàn, hãy thử lại!"
     chat: true
-    actionbar: true
-  cooldown:
-    text: "&#ff0812Vui lòng chờ 60s để tiếp tục!"
-    chat: true
-    actionbar: true
-  reload:
-    text: "&aĐã reload cấu hình!"
-    chat: true
-    actionbar: true
+    actionbar: false
