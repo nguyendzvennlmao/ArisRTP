@@ -1,4 +1,3 @@
-license-key: ""
 settings:
   gui:
     title: "&8ʀᴀɴᴅᴏᴍ ᴛᴇʟᴇᴘᴏʀᴛ"
@@ -13,7 +12,7 @@ settings:
   worlds:
     world:
       slot: 11
-      min-y: 63
+      min-y: 50
       max-y: 120
       max-radius: 5000
       min-radius: 100
@@ -33,8 +32,8 @@ settings:
         - "&fClick to randomly teleport"
     world_the_end:
       slot: 15
-      min-y: 55
-      max-y: 75
+      min-y: 50
+      max-y: 100
       max-radius: 3000
       min-radius: 100
       item: END_STONE
