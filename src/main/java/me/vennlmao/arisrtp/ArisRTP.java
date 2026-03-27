@@ -146,8 +146,8 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         UUID id = p.getUniqueId();
         teleporting.add(id);
         for (int i = 5; i >= 0; i--) {
-            int time = i;
-            Bukkit.getGlobalRegionScheduler().executeDelayed(this, (task) -> {
+            final int time = i;
+            Bukkit.getGlobalRegionScheduler().runDelayed(this, (task) -> {
                 if (!teleporting.contains(id)) return;
                 if (p.getLocation().distanceSquared(startLoc) > 0.05) {
                     teleporting.remove(id);
@@ -233,4 +233,4 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         matcher.appendTail(sb);
         return ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
-                             }
+            }
