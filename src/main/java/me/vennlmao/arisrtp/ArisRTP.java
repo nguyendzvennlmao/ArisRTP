@@ -145,24 +145,25 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         Location startLoc = p.getLocation().clone();
         UUID id = p.getUniqueId();
         teleporting.add(id);
-        for (int i = 5; i >= 0; i--) {
-            final int time = i;
+        for (int i = 0; i <= 5; i++) {
+            final int secondsLeft = 5 - i;
+            long delayTicks = (i == 0) ? 1L : i * 20L;
             Bukkit.getGlobalRegionScheduler().runDelayed(this, (task) -> {
                 if (!teleporting.contains(id)) return;
-                if (p.getLocation().distanceSquared(startLoc) > 0.05) {
+                if (p.getLocation().distanceSquared(startLoc) > 0.1) {
                     teleporting.remove(id);
                     sendCustomMessage(p, "cancelled");
                     playConfigSound(p, "cooldown-error");
                     return;
                 }
-                if (time > 0) {
-                    sendCustomMessage(p, "countdown", "%time%", String.valueOf(time));
+                if (secondsLeft > 0) {
+                    sendCustomMessage(p, "countdown", "%time%", String.valueOf(secondsLeft));
                     playConfigSound(p, "countdown-tick");
                 } else {
                     teleporting.remove(id);
                     findSafe(p, w, 0);
                 }
-            }, (5 - i) * 20L);
+            }, delayTicks);
         }
     }
 
@@ -233,4 +234,4 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         matcher.appendTail(sb);
         return ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
-  }
+            }
