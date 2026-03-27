@@ -142,15 +142,14 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
     }
 
     private void handleRTP(Player p, World w) {
-        Location startLoc = p.getLocation();
+        Location startLoc = p.getLocation().clone();
         UUID id = p.getUniqueId();
         teleporting.add(id);
-        
         for (int i = 5; i >= 0; i--) {
             int time = i;
-            Bukkit.getRegionScheduler().executeDelayed(this, p.getLocation(), () -> {
+            Bukkit.getGlobalRegionScheduler().executeDelayed(this, (task) -> {
                 if (!teleporting.contains(id)) return;
-                if (p.getLocation().distanceSquared(startLoc) > 0.01) {
+                if (p.getLocation().distanceSquared(startLoc) > 0.05) {
                     teleporting.remove(id);
                     sendCustomMessage(p, "cancelled");
                     playConfigSound(p, "cooldown-error");
@@ -168,24 +167,21 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
     }
 
     private void findSafe(Player p, World w, int t) {
-        if (t >= getConfig().getInt("settings.max-retries")) {
+        if (t >= getConfig().getInt("settings.max-retries", 50)) {
             sendCustomMessage(p, "not-found");
             playConfigSound(p, "cooldown-error");
             return;
         }
         sendCustomMessage(p, "searching");
         String path = "settings.worlds." + w.getName();
-        int r = getConfig().getInt(path + ".max-radius");
+        int r = getConfig().getInt(path + ".max-radius", 1000);
         int minRad = getConfig().getInt(path + ".min-radius", 0);
-        
         int x = ThreadLocalRandom.current().nextInt(minRad, r) * (ThreadLocalRandom.current().nextBoolean() ? 1 : -1);
         int z = ThreadLocalRandom.current().nextInt(minRad, r) * (ThreadLocalRandom.current().nextBoolean() ? 1 : -1);
-
         w.getChunkAtAsync(x >> 4, z >> 4).thenAccept(chunk -> {
-            int minY = getConfig().getInt(path + ".min-y");
-            int maxY = getConfig().getInt(path + ".max-y");
+            int minY = getConfig().getInt(path + ".min-y", 63);
+            int maxY = getConfig().getInt(path + ".max-y", 120);
             int y = -1;
-            
             for (int i = maxY; i >= minY; i--) {
                 Block b = w.getBlockAt(x, i, z);
                 if (b.getType().isSolid() && b.getType() != Material.BEDROCK) {
@@ -195,24 +191,20 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
                     }
                 }
             }
-
             if (y == -1) {
                 findSafe(p, w, t + 1);
                 return;
             }
-
             Location loc = new Location(w, x + 0.5, y, z + 0.5);
-            Material standingOn = loc.clone().add(0, -1, 0).getBlock().getType();
-            if (unsafeBlocks.contains(standingOn)) {
+            if (unsafeBlocks.contains(loc.clone().add(0, -1, 0).getBlock().getType())) {
                 findSafe(p, w, t + 1);
                 return;
             }
-
             p.teleportAsync(loc).thenAccept(s -> {
                 if (s) {
                     sendCustomMessage(p, "success");
                     playConfigSound(p, "teleport-success");
-                    cooldowns.put(p.getUniqueId(), System.currentTimeMillis() + (getConfig().getLong("settings.cooldown-seconds") * 1000));
+                    cooldowns.put(p.getUniqueId(), System.currentTimeMillis() + (getConfig().getLong("settings.cooldown-seconds", 60) * 1000));
                 }
             });
         });
@@ -241,4 +233,4 @@ public class ArisRTP extends JavaPlugin implements Listener, CommandExecutor {
         matcher.appendTail(sb);
         return ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
-    }
+                }
